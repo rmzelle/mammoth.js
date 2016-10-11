@@ -13,7 +13,40 @@
     }
     
     function displayResult(result) {
-        document.getElementById("output").innerHTML = extractedFields.join();
+        // Isolate Zotero fields
+        var zoteroFields = [];
+        
+        for (var i = 0; i < extractedFields.length; i++) {
+          var field = extractedFields[i].trim();
+          
+          // test if field starts with "ADDIN ZOTERO_ITEM CSL_CITATION"
+          var zoteroFieldPrefix = "ADDIN ZOTERO_ITEM CSL_CITATION";
+          if (field.startsWith(zoteroFieldPrefix)) {
+            field = field.replace(zoteroFieldPrefix,"").trim();
+            
+            // parse rest of field content as JSON
+            try {
+              var fieldObject = {};
+              fieldObject = JSON.parse(field);
+              if (fieldObject.hasOwnProperty("citationItems")) {
+                //console.log(fieldObject);
+                for (var j = 0; j < fieldObject.citationItems.length; j++) {
+                  var zoteroItem = fieldObject.citationItems[j];
+                  if (zoteroItem.hasOwnProperty("itemData")) {
+                    zoteroFields.push(zoteroItem.itemData);
+                  }
+                }
+              }
+            }
+            catch (e) {}
+            
+          }
+          
+          //console.log(zoteroFields);
+          //console.log(JSON.stringify(zoteroFields));
+        }
+      
+        document.getElementById("output").innerHTML = JSON.stringify(zoteroFields);
         
         var messageHtml = result.messages.map(function(message) {
             return '<li class="' + message.type + '">' + escapeHtml(message.message) + "</li>";
