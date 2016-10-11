@@ -3,6 +3,8 @@
         .addEventListener("change", handleFileSelect, false);
         
     function handleFileSelect(event) {
+        window.extractedFields = [];
+        
         readFileInputEventAsArrayBuffer(event, function(arrayBuffer) {
             mammoth.convertToHtml({arrayBuffer: arrayBuffer})
                 .then(displayResult)
@@ -11,7 +13,7 @@
     }
     
     function displayResult(result) {
-        document.getElementById("output").innerHTML = result.value;
+        document.getElementById("output").innerHTML = extractedFields.join();
         
         var messageHtml = result.messages.map(function(message) {
             return '<li class="' + message.type + '">' + escapeHtml(message.message) + "</li>";
